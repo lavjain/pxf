@@ -37,6 +37,8 @@ public enum HcfsType {
     },
     GS,
     HDFS,
+    // LOCALFILE is deprecated and it will be removed in version 6.0.0 of PXF
+    @Deprecated
     LOCALFILE("file") {
         @Override
         public String validateAndNormalizeDataSource(String dataSource) {

@@ -121,13 +121,14 @@ public class HcfsTypeTest {
     }
 
     @Test
-    public void testAllowWritingToLocalFileSystemWithLOCALFILE() {
-        context.setProfileScheme("localfile");
+    public void testAllowWritingToLocalFileSystemWithNFS() {
+        configuration.set("pxf.fs.basePath", "/");
+        context.setProfileScheme("nfs");
 
         HcfsType type = HcfsType.getHcfsType(configuration, context);
-        assertEquals(HcfsType.LOCALFILE, type);
+        assertEquals(HcfsType.NFS, type);
         assertEquals("file:///foo/bar.txt", type.getDataUri(configuration, context));
-        assertEquals("same", type.normalizeDataSource("same"));
+        assertEquals("same", type.validateAndNormalizeDataSource("same"));
     }
 
     @Test
@@ -371,6 +372,146 @@ public class HcfsTypeTest {
         String dataUri = type.getDataUri(configuration, context);
         assertEquals("hdfs://0.0.0.0:8020/tmp/issues/172848577/[a-b].csv", dataUri);
         assertEquals("0.0.0.0", configuration.get(MRJobConfig.JOB_NAMENODES_TOKEN_RENEWAL_EXCLUDE));
+    }
+
+    @Test
+    public void testFailureOnNFSWhenBasePathIsNotConfigured() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("the 'pxf.fs.basePath' configuration is required to access NFS filesystems. Configure a valid 'pxf.fs.basePath' property to access this server");
+
+        context.setProfileScheme("nfs");
+        HcfsType.getHcfsType(configuration, context);
+    }
+
+    @Test
+    public void testFailureOnNFSWhenInvalidDefaultFSIsProvided() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("profile protocol (nfs) is not compatible with server filesystem (s3a)");
+
+        configuration.set("fs.defaultFS", "s3a://abc/");
+        context.setProfileScheme("nfs");
+        HcfsType.getHcfsType(configuration, context);
+    }
+
+    @Test
+    public void testBasePathIsConfiguredToRootDirectory() {
+        configuration.set("pxf.fs.basePath", "/");
+        context.setProfileScheme("nfs");
+        HcfsType nfs = HcfsType.getHcfsType(configuration, context);
+        String uri = nfs.getDataUri(configuration, context);
+        assertEquals("file:///foo/bar.txt", uri);
+    }
+
+    @Test
+    public void testBasePathIsConfiguredToAFixedBucket() {
+        configuration.set("pxf.fs.basePath", "some-bucket");
+        context.setProfileScheme("s3a");
+        HcfsType nfs = HcfsType.getHcfsType(configuration, context);
+        String uri = nfs.getDataUri(configuration, context);
+        assertEquals("s3a://some-bucket/foo/bar.txt", uri);
+    }
+
+    @Test
+    public void testBasePathIsConfiguredToASingleCharPath() {
+        configuration.set("pxf.fs.basePath", "p");
+        context.setProfileScheme("nfs");
+        HcfsType nfs = HcfsType.getHcfsType(configuration, context);
+        String uri = nfs.getDataUri(configuration, context);
+        assertEquals("file:///p/foo/bar.txt", uri);
+
+        // trailing / in basePath
+        configuration.set("pxf.fs.basePath", "p/");
+        context.setProfileScheme("nfs");
+        nfs = HcfsType.getHcfsType(configuration, context);
+        uri = nfs.getDataUri(configuration, context);
+        assertEquals("file:///p/foo/bar.txt", uri);
+
+        // preceding / in basePath
+        configuration.set("pxf.fs.basePath", "/p");
+        context.setProfileScheme("nfs");
+        nfs = HcfsType.getHcfsType(configuration, context);
+        uri = nfs.getDataUri(configuration, context);
+        assertEquals("file:///p/foo/bar.txt", uri);
+
+        // trailing and preceding / in basePath
+        configuration.set("pxf.fs.basePath", "/p/");
+        context.setProfileScheme("nfs");
+        nfs = HcfsType.getHcfsType(configuration, context);
+        uri = nfs.getDataUri(configuration, context);
+        assertEquals("file:///p/foo/bar.txt", uri);
+    }
+
+    @Test
+    public void testBasePathIsConfiguredToSomeValue() {
+        configuration.set("pxf.fs.basePath", "/my/base/path");
+        context.setProfileScheme("nfs");
+        HcfsType nfs = HcfsType.getHcfsType(configuration, context);
+        String uri = nfs.getDataUri(configuration, context);
+        assertEquals("file:///my/base/path/foo/bar.txt", uri);
+
+        // no / preceding the basePath
+        configuration.set("pxf.fs.basePath", "my/base/path");
+        context.setProfileScheme("nfs");
+        uri = nfs.getDataUri(configuration, context);
+        assertEquals("file:///my/base/path/foo/bar.txt", uri);
+
+        // no / trailing the basePath
+        configuration.set("pxf.fs.basePath", "my/base/path");
+        context.setProfileScheme("nfs");
+        uri = nfs.getDataUri(configuration, context);
+        assertEquals("file:///my/base/path/foo/bar.txt", uri);
+
+        // preceding and trailing / in the basePath
+        configuration.set("pxf.fs.basePath", "/my/base/path/");
+        context.setProfileScheme("nfs");
+        uri = nfs.getDataUri(configuration, context);
+        assertEquals("file:///my/base/path/foo/bar.txt", uri);
+    }
+
+    @Test
+    public void testFailsWhenARelativeDataSourceIsProvided1() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("the provided path '../../../etc/passwd' is invalid. Relative paths are not allowed by PXF");
+
+        configuration.set("pxf.fs.basePath", "/some/base/path");
+        context.setProfileScheme("nfs");
+        context.setDataSource("../../../etc/passwd");
+        HcfsType nfs = HcfsType.getHcfsType(configuration, context);
+        nfs.getDataUri(configuration, context);
+    }
+
+    @Test
+    public void testFailsWhenARelativeDataSourceIsProvided2() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("the provided path '..' is invalid. Relative paths are not allowed by PXF");
+
+        configuration.set("pxf.fs.basePath", "/some/base/path");
+        context.setProfileScheme("nfs");
+        context.setDataSource("..");
+        HcfsType nfs = HcfsType.getHcfsType(configuration, context);
+        nfs.getDataUri(configuration, context);
+    }
+
+    @Test
+    public void testDataSourceWithTwoDotsInName() {
+        configuration.set("pxf.fs.basePath", "/some/base/path");
+        context.setProfileScheme("nfs");
+        context.setDataSource("a..txt");
+        HcfsType nfs = HcfsType.getHcfsType(configuration, context);
+        String uri = nfs.getDataUri(configuration, context);
+        assertEquals("file:///some/base/path/a..txt", uri);
+    }
+
+    @Test
+    public void testFailsWhenADollarSignInDataSourceIsProvided() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("the provided path '$HOME/secret-files-in-gpadmin-home' is invalid. The dollar sign character ($) is not allowed by PXF");
+
+        configuration.set("pxf.fs.basePath", "/");
+        context.setProfileScheme("nfs");
+        context.setDataSource("$HOME/secret-files-in-gpadmin-home");
+        HcfsType nfs = HcfsType.getHcfsType(configuration, context);
+        nfs.getDataUri(configuration, context);
     }
 
 }
