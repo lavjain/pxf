@@ -31,7 +31,7 @@ public enum HcfsType {
         }
 
         @Override
-        public String normalizeDataSource(String dataSource) {
+        public String validateAndNormalizeDataSource(String dataSource) {
             return dataSource;
         }
     },
@@ -39,8 +39,21 @@ public enum HcfsType {
     HDFS,
     LOCALFILE("file") {
         @Override
-        public String normalizeDataSource(String dataSource) {
+        public String validateAndNormalizeDataSource(String dataSource) {
             return dataSource;
+        }
+    },
+    NFS("file") {
+        @Override
+        protected String validateAndNormalizeBasePath(String basePath) {
+            if (StringUtils.isBlank(basePath))
+                throw new IllegalArgumentException(
+                        String.format("the '%s' configuration is required to access %s filesystems. Configure a valid '%s' property to access this server",
+                                CONFIG_KEY_BASE_PATH, this, CONFIG_KEY_BASE_PATH));
+
+            return "/".equals(basePath)
+                    ? "/"
+                    : "/" + StringUtils.removeEnd(StringUtils.removeStart(basePath, "/"), "/") + "/";
         }
     },
     S3,
@@ -49,6 +62,8 @@ public enum HcfsType {
     // We prefer WASBS over WASB for Azure Blob Storage,
     // as it uses SSL for communication to Azure servers
     WASBS;
+
+    public static final String CONFIG_KEY_BASE_PATH = "pxf.fs.basePath";
 
     protected Logger LOG = LoggerFactory.getLogger(this.getClass());
 
@@ -142,11 +157,10 @@ public enum HcfsType {
      * @return an absolute data path for write
      */
     public String getUriForWrite(Configuration configuration, RequestContext context, boolean skipCodecExtension) {
-        String fileName = StringUtils.removeEnd(getDataUri(configuration, context), "/") +
-                "/" +
-                context.getTransactionId() +
-                "_" +
-                context.getSegmentId();
+        String fileName = String.format("%s/%s_%d",
+                StringUtils.removeEnd(getDataUri(configuration, context), "/"),
+                context.getTransactionId(),
+                context.getSegmentId());
 
         if (!skipCodecExtension) {
             String compressCodec = context.getOption("COMPRESSION_CODEC");
@@ -199,8 +213,23 @@ public enum HcfsType {
      * @param dataSource The path to the data source
      * @return the normalized path to the data source
      */
-    public String normalizeDataSource(String dataSource) {
-        return StringUtils.removeStart(dataSource, "/");
+    public String validateAndNormalizeDataSource(String dataSource) {
+
+        String effectiveBasePath = StringUtils.removeStart(dataSource, "/");
+
+        if ("..".equals(effectiveBasePath) || StringUtils.contains(effectiveBasePath, "../")) {
+            // Disallow relative paths
+            throw new IllegalArgumentException(String
+                    .format("the provided path '%s' is invalid. Relative paths are not allowed by PXF", effectiveBasePath));
+        }
+
+        if (StringUtils.contains(effectiveBasePath, "$")) {
+            // Disallow $ to prevent users to access environment variables
+            throw new IllegalArgumentException(String
+                    .format("the provided path '%s' is invalid. The dollar sign character ($) is not allowed by PXF", effectiveBasePath));
+        }
+
+        return effectiveBasePath;
     }
 
     protected String getDataUriForPrefix(Configuration configuration, RequestContext context, String scheme) {
@@ -212,18 +241,35 @@ public enum HcfsType {
         URI defaultFS = FileSystem.getDefaultUri(configuration);
 
         String uri;
-        String normalizedDataSource = normalizeDataSource(dataSource);
+        String basePath = validateAndNormalizeBasePath(configuration.get(CONFIG_KEY_BASE_PATH));
+        String normalizedDataSource = validateAndNormalizeDataSource(dataSource);
 
         if (FILE_SCHEME.equals(defaultFS.getScheme())) {
             // if the defaultFS is file://, but enum is not FILE, use enum scheme only
-            uri = StringUtils.removeEnd(scheme, "://") + "://" + normalizedDataSource;
+            uri = StringUtils.removeEnd(scheme, "://") + "://" + basePath + normalizedDataSource;
         } else {
             // if the defaultFS is not file://, use it, instead of enum scheme and append user's path
-            uri = StringUtils.removeEnd(defaultFS.toString(), "/") + "/" + normalizedDataSource;
+            uri = StringUtils.removeEnd(defaultFS.toString(), "/") + basePath + "/" + normalizedDataSource;
         }
 
         disableSecureTokenRenewal(uri, configuration);
         return uri;
+    }
+
+    /**
+     * Validates the basePath and normalizes it for the appropriate filesystem
+     *
+     * @param basePath the basePath as configured by the user
+     * @return the normalized basePath
+     */
+    protected String validateAndNormalizeBasePath(String basePath) {
+        if (StringUtils.isNotBlank(basePath)) {
+            if ("/".equals(basePath))
+                return "/";
+            return StringUtils.removeEnd(StringUtils.removeStart(basePath, "/"), "/") + "/";
+        }
+        // Return an empty string to prevent "null" in the string concatenation
+        return "";
     }
 
     /**
