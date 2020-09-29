@@ -88,7 +88,6 @@ groups:
   - Test PXF-GP[[gp_ver]]-MINIO-NO-IMPERS on RHEL7
   - Test PXF-GP[[gp_ver]]-HDP2-SECURE-MULTI-IMPERS on RHEL7
   - Test PXF-GP[[gp_ver]]-HDP2-SECURE-MULTI-NO-IMPERS on RHEL7
-  - Test PXF-GP[ [ gp_ver ] ]-OSS-NO-IMPERS on RHEL7
 {% set gp_ver = None %}
 - name: Backwards Compatibility
   jobs:
@@ -1642,4 +1641,3 @@ jobs:
       attachment_globs: [pxf_artifacts/((pxf-osl-file-prefix))*.txt]
       to_text: "((pxf-releng-email)),((pxf-ud-email))"
 {% endif %}
-
