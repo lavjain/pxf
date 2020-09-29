@@ -21,6 +21,7 @@ SSH_OPTS=(-i cluster_env_files/private_key.pem -o 'StrictHostKeyChecking=no')
 HADOOP_SSH_OPTS=(-o 'StrictHostKeyChecking=no')
 IMPERSONATION=${IMPERSONATION:-true}
 LOCAL_GPHD_ROOT=/singlecluster
+PROTOCOL=${PROTOCOL:-}
 PROXY_USER=${PROXY_USER:-pxfuser}
 
 function configure_local_hdfs() {
@@ -351,13 +352,18 @@ function _main() {
 	cp -R cluster_env_files/.ssh/* /root/.ssh
 	# make an array, gpdb_segments, containing hostnames that contain 'sdw'
 	mapfile -t gpdb_segments < <(grep < cluster_env_files/etc_hostfile -e sdw | awk '{print $1}')
-	if [[ -d dataproc_env_files ]]; then
+	if [[ ${PROTOCOL} == nfs ]]; then
+		HADOOP_HOSTNAME=localhost
+		HADOOP_USER=gpadmin
+		HDFS_BIN=/singlecluster/bin
+		hadoop_ip=127.0.0.1
+	elif [[ -d dataproc_env_files ]]; then
 		HADOOP_HOSTNAME=$(< dataproc_env_files/name)
 		HADOOP_USER=gpadmin
 		hadoop_ip=$(getent hosts "${HADOOP_HOSTNAME}.c.${GOOGLE_PROJECT_ID}.internal" | awk '{ print $1 }')
 		HADOOP_SSH_OPTS+=(-i dataproc_env_files/google_compute_engine)
 		HDFS_BIN=/usr/bin
-	else
+	elif grep "edw0" cluster_env_files/etc_hostfile; then
 		HADOOP_HOSTNAME=hadoop
 		HADOOP_USER=centos
 		HDFS_BIN=~centos/singlecluster/bin
@@ -387,9 +393,9 @@ function _main() {
 
 	setup_pxf_on_cluster
 
-	if [[ $KERBEROS != true ]]; then
-		run_multinode_smoke_test 1000
-	fi
+#	if [[ $KERBEROS != true ]]; then
+#		run_multinode_smoke_test 1000
+#	fi
 
 	inflate_dependencies
 	run_pxf_automation

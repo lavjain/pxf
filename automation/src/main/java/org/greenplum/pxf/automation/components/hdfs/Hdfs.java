@@ -527,7 +527,11 @@ public class Hdfs extends BaseSystemObject implements IFSFunctionality {
         this.workingDirectory = workingDirectory;
 
         if (workingDirectory != null) {
-            this.workingDirectory = workingDirectory.replace("__UUID__", UUID.randomUUID().toString());
+            String basePath = StringUtils.defaultIfBlank(System.getenv("BASE_PATH"), "");
+
+            this.workingDirectory = workingDirectory
+                    .replace("${base.path}", basePath)
+                    .replace("__UUID__", UUID.randomUUID().toString());
         }
     }
 

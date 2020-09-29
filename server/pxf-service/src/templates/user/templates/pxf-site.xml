@@ -42,12 +42,12 @@
         <value></value>
         <description>
         <![CDATA[
-            Sets the base path when constructing a URI for read and write.
-            This property must be set in the server configuration for NFS-based
-            (Network File System) profiles. This property is useful when
-            setting the path to a mount point for a given filesystem. This
-            prevents users from creating tables accessing data outside of the
-            mount point.
+            Sets the base path when constructing a URI for read and write
+            operations. This property must be set in the server configuration
+            for NFS-based (Network File System) profiles. This property is
+            useful when setting the path to a mount point for a given
+            filesystem. This prevents users from creating tables accessing
+            data outside of the mount point.
 
             For example, if the pxf.fs.basePath property is set to /mount/path/
             and an external table definition is the following:
@@ -60,8 +60,8 @@
             AVRO files. Users won't be able to access data at the root
             directory of the filesystem.
 
-            This property can also be used for any HCFS-compatible filesystem,
-            for example S3.
+            This property can also be used for any Hadoop compatible file
+            system, for example S3.
         ]]>
         </description>
     </property>

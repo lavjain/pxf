@@ -33,6 +33,7 @@ ADL                         ?= false
 GS                          ?= false
 MINIO                       ?= false
 OEL7                        ?= false
+NFS                         ?= false
 
 .PHONY: build certification dev pr
 build: set-build-pipeline
@@ -106,6 +107,7 @@ set-dev-build-pipeline:
 		hdp3=$(HDP3) \
 		mapr=$(MAPR) \
 		ambari=$(AMBARI) \
+		nfs=$(NFS) \
 		s3=$(S3) \
 		adl=$(ADL) \
 		gs=$(GS) \
