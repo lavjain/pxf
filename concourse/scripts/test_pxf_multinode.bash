@@ -93,17 +93,17 @@ function setup_pxf_on_cluster() {
 		if [[ ${PROTOCOL} == nfs ]]; then
 			mkdir -p ${PXF_CONF_DIR}/servers/nfs
 			cp ${PXF_CONF_DIR}/templates/pxf-site.xml ${PXF_CONF_DIR}/servers/nfs/
-			sed -i -e '</configuration>|<property><name>pxf.fs.basePath</name><value>${BASE_PATH}</value></property></configuration>|g' ${PXF_CONF_DIR}/servers/nfs/pxf-site.xml
+			sed -i '</configuration>|<property><name>pxf.fs.basePath</name><value>${BASE_PATH}</value></property></configuration>|g' ${PXF_CONF_DIR}/servers/nfs/pxf-site.xml
 		fi &&
 		mkdir -p ${PXF_CONF_DIR}/servers/s3{,-invalid} &&
 		cp ${PXF_CONF_DIR}/templates/s3-site.xml ${PXF_CONF_DIR}/servers/s3 &&
 		cp ${PXF_CONF_DIR}/templates/s3-site.xml ${PXF_CONF_DIR}/servers/s3-invalid &&
-		sed -i -e \"s|YOUR_AWS_ACCESS_KEY_ID|${ACCESS_KEY_ID}|\" \
+		sed -i  -e \"s|YOUR_AWS_ACCESS_KEY_ID|${ACCESS_KEY_ID}|\" \
 			-e \"s|YOUR_AWS_SECRET_ACCESS_KEY|${SECRET_ACCESS_KEY}|\" \
 			${PXF_CONF_DIR}/servers/s3/s3-site.xml &&
 		mkdir -p ${PXF_CONF_DIR}/servers/database &&
 		cp ${PXF_CONF_DIR}/templates/jdbc-site.xml ${PXF_CONF_DIR}/servers/database/ &&
-		sed -i -e 's|YOUR_DATABASE_JDBC_DRIVER_CLASS_NAME|org.postgresql.Driver|' \
+		sed -i  -e 's|YOUR_DATABASE_JDBC_DRIVER_CLASS_NAME|org.postgresql.Driver|' \
 			-e 's|YOUR_DATABASE_JDBC_URL|jdbc:postgresql://mdw:5432/pxfautomation|' \
 			-e 's|YOUR_DATABASE_JDBC_USER|gpadmin|' \
 			-e 's|YOUR_DATABASE_JDBC_PASSWORD||' \
