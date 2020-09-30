@@ -90,15 +90,20 @@ function setup_pxf_on_cluster() {
 		else
 			cp ${PXF_CONF_DIR}/templates/mapred{,1}-site.xml
 		fi &&
+		if [[ ${PROTOCOL} == nfs ]]; then
+			mkdir -p ${PXF_CONF_DIR}/servers/nfs
+			cp ${PXF_CONF_DIR}/templates/pxf-site.xml ${PXF_CONF_DIR}/servers/nfs/
+			sed -i -e '</configuration>|<property><name>pxf.fs.basePath</name><value>${BASE_PATH}</value></property></configuration>|g' ${PXF_CONF_DIR}/servers/nfs/pxf-site.xml
+		fi &&
 		mkdir -p ${PXF_CONF_DIR}/servers/s3{,-invalid} &&
 		cp ${PXF_CONF_DIR}/templates/s3-site.xml ${PXF_CONF_DIR}/servers/s3 &&
 		cp ${PXF_CONF_DIR}/templates/s3-site.xml ${PXF_CONF_DIR}/servers/s3-invalid &&
-		sed -i  -e \"s|YOUR_AWS_ACCESS_KEY_ID|${ACCESS_KEY_ID}|\" \
+		sed -i -e \"s|YOUR_AWS_ACCESS_KEY_ID|${ACCESS_KEY_ID}|\" \
 			-e \"s|YOUR_AWS_SECRET_ACCESS_KEY|${SECRET_ACCESS_KEY}|\" \
 			${PXF_CONF_DIR}/servers/s3/s3-site.xml &&
 		mkdir -p ${PXF_CONF_DIR}/servers/database &&
 		cp ${PXF_CONF_DIR}/templates/jdbc-site.xml ${PXF_CONF_DIR}/servers/database/ &&
-		sed -i  -e 's|YOUR_DATABASE_JDBC_DRIVER_CLASS_NAME|org.postgresql.Driver|' \
+		sed -i -e 's|YOUR_DATABASE_JDBC_DRIVER_CLASS_NAME|org.postgresql.Driver|' \
 			-e 's|YOUR_DATABASE_JDBC_URL|jdbc:postgresql://mdw:5432/pxfautomation|' \
 			-e 's|YOUR_DATABASE_JDBC_USER|gpadmin|' \
 			-e 's|YOUR_DATABASE_JDBC_PASSWORD||' \
@@ -287,6 +292,28 @@ function setup_pxf_kerberos_on_cluster() {
 	"
 }
 
+function configure_nfs() {
+	echo "check available NFS shares in mdw"
+	showmount -e mdw
+
+	echo "install the NFS client"
+	yum install -y -q -e 0 nfs-utils
+
+	echo "create mount point and mount it"
+	mkdir -p "${BASE_PATH}"
+	mount mdw:/var/nfs "${BASE_PATH}"
+	chown gpadmin:gpadmin "${BASE_PATH}"
+	chmod 755 "${BASE_PATH}"
+
+	echo "verify the mount worked"
+	mount | grep nfs
+	df -hT
+
+	echo "write a test file to make sure it worked"
+	sudo runuser -l gpadmin -c "touch ${BASE_PATH}/$(hostname)-test"
+	ls -l "${BASE_PATH}"
+}
+
 function run_pxf_automation() {
 	local multiNodesCluster=pxf_src/automation/src/test/resources/sut/MultiNodesCluster.xml
 
@@ -393,9 +420,13 @@ function _main() {
 
 	setup_pxf_on_cluster
 
-#	if [[ $KERBEROS != true ]]; then
-#		run_multinode_smoke_test 1000
-#	fi
+	if [[ $PROTOCOL == nfs ]]; then
+		configure_nfs # configures NFS on the container
+	fi
+
+	if [[ $KERBEROS != true ]]; then
+		run_multinode_smoke_test 1000
+	fi
 
 	inflate_dependencies
 	run_pxf_automation
