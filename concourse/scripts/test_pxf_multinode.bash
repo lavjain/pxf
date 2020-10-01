@@ -295,6 +295,10 @@ function configure_nfs() {
 	echo "install the NFS client"
 	yum install -y -q -e 0 nfs-utils
 
+	echo "start required NFS services"
+	service rpcbind start
+	service nfs-common start
+
 	echo "check available NFS shares in mdw"
 	showmount -e mdw
 

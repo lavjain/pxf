@@ -21,9 +21,6 @@ function create_nfs_installer_scripts() {
 
 set -euxo pipefail
 
-echo "install the NFS client"
-yum install -y -q -e 0 nfs-utils
-
 echo "check available NFS shares in mdw"
 showmount -e mdw
 
@@ -52,8 +49,6 @@ function run_nfs_installation() {
 
   # install and configure the NFS server on master
   ssh "centos@${MASTER_HOSTNAME}" "
-    echo 'install NFS server'
-    sudo yum install -y -q -e 0 nfs-utils
     echo 'enable and start the NFS service'
     sudo systemctl enable nfs-server rpcbind
     sudo systemctl start nfs-server rpcbind
