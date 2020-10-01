@@ -90,11 +90,6 @@ function setup_pxf_on_cluster() {
 		else
 			cp ${PXF_CONF_DIR}/templates/mapred{,1}-site.xml
 		fi &&
-		if [[ ${PROTOCOL} == nfs ]]; then
-			mkdir -p ${PXF_CONF_DIR}/servers/nfs
-			cp ${PXF_CONF_DIR}/templates/pxf-site.xml ${PXF_CONF_DIR}/servers/nfs/
-			sed -i '</configuration>|<property><name>pxf.fs.basePath</name><value>${BASE_PATH}</value></property></configuration>|g' ${PXF_CONF_DIR}/servers/nfs/pxf-site.xml
-		fi &&
 		mkdir -p ${PXF_CONF_DIR}/servers/s3{,-invalid} &&
 		cp ${PXF_CONF_DIR}/templates/s3-site.xml ${PXF_CONF_DIR}/servers/s3 &&
 		cp ${PXF_CONF_DIR}/templates/s3-site.xml ${PXF_CONF_DIR}/servers/s3-invalid &&
@@ -424,7 +419,7 @@ function _main() {
 		configure_nfs # configures NFS on the container
 	fi
 
-	if [[ $KERBEROS != true ]]; then
+	if [[ $PROTOCOL != nfs ]] && [[ $KERBEROS != true ]]; then
 		run_multinode_smoke_test 1000
 	fi
 
