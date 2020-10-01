@@ -21,11 +21,11 @@ function create_nfs_installer_scripts() {
 
 set -euxo pipefail
 
-echo "check available NFS shares in mdw"
-showmount -e mdw
-
 echo "install the NFS client"
 yum install -y -q -e 0 nfs-utils
+
+echo "check available NFS shares in mdw"
+showmount -e mdw
 
 echo "create mount point and mount it"
 mkdir -p ${BASE_PATH}

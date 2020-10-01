@@ -8,9 +8,9 @@ export GPHOME=/usr/local/greenplum-db-devel
 # whether PXF is being installed from a new component-based packaging
 PXF_COMPONENT=${PXF_COMPONENT:=false}
 if [[ ${PXF_COMPONENT} == "true" ]]; then
-    PXF_HOME=/usr/local/pxf-gp${GP_VER}
+	PXF_HOME=/usr/local/pxf-gp${GP_VER}
 else
-    PXF_HOME=${GPHOME}/pxf
+	PXF_HOME=${GPHOME}/pxf
 fi
 export PXF_HOME
 
@@ -288,11 +288,11 @@ function setup_pxf_kerberos_on_cluster() {
 }
 
 function configure_nfs() {
-	echo "check available NFS shares in mdw"
-	showmount -e mdw
-
 	echo "install the NFS client"
 	yum install -y -q -e 0 nfs-utils
+
+	echo "check available NFS shares in mdw"
+	showmount -e mdw
 
 	echo "create mount point and mount it"
 	mkdir -p "${BASE_PATH}"
