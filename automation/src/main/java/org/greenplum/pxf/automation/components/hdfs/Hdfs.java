@@ -527,7 +527,7 @@ public class Hdfs extends BaseSystemObject implements IFSFunctionality {
         this.workingDirectory = workingDirectory;
 
         if (workingDirectory != null) {
-            String basePath = StringUtils.defaultIfBlank(System.getenv("BASE_PATH"), "");
+            String basePath = getBasePath();
 
             this.workingDirectory = workingDirectory
                     .replace("${base.path}", basePath)
@@ -549,6 +549,10 @@ public class Hdfs extends BaseSystemObject implements IFSFunctionality {
 
     public void setHadoopRoot(String hadoopRoot) {
         this.hadoopRoot = hadoopRoot;
+    }
+
+    public String getBasePath() {
+        return StringUtils.defaultIfBlank(System.getenv("BASE_PATH"), "");
     }
 
     public String getTestKerberosPrincipal() {

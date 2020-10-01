@@ -29,12 +29,12 @@ public class HdfsWritableSequenceTest extends BaseWritableFeature {
 
     private String hdfsPath;
 
-    private String schemaPackage = "org.greenplum.pxf.automation.dataschema.";
-    private String customSchemaFileName = "CustomWritable";
-    private String customSchemaWithCharFileName = "CustomWritableWithChar";
-    private String customSchemaWithCircleFileName = "CustomWritableWithCircle";
+    private final String schemaPackage = "org.greenplum.pxf.automation.dataschema.";
+    private final String customSchemaFileName = "CustomWritable";
+    private final String customSchemaWithCharFileName = "CustomWritableWithChar";
+    private final String customSchemaWithCircleFileName = "CustomWritableWithCircle";
 
-    private String[] customWritableFields = {
+    private final String[] customWritableFields = {
             "tmp1   TIMESTAMP",
             "num1   INTEGER",
             "num2   INTEGER",

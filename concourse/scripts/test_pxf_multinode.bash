@@ -123,7 +123,7 @@ function setup_pxf_on_cluster() {
 			-e 's|YOUR_DATABASE_JDBC_PASSWORD||' \
 			${PXF_CONF_DIR}/servers/db-hive/jdbc-site.xml &&
 		cp ~gpadmin/hive-report.sql ${PXF_CONF_DIR}/servers/db-hive &&
-		if [[ ${PROTOCOL} == nfs ]]; then
+		if [[ \"${PROTOCOL}\" == \"nfs\" ]]; then
 			mkdir -p ${PXF_CONF_DIR}/servers/nfs
 			cp ${PXF_CONF_DIR}/templates/pxf-site.xml ${PXF_CONF_DIR}/servers/nfs
 			sed -i 's|</configuration>|<property><name>pxf.fs.basePath</name><value>${BASE_PATH}</value></property></configuration>|g' ${PXF_CONF_DIR}/servers/nfs/pxf-site.xml
@@ -381,7 +381,7 @@ function _main() {
 	cp -R cluster_env_files/.ssh/* /root/.ssh
 	# make an array, gpdb_segments, containing hostnames that contain 'sdw'
 	mapfile -t gpdb_segments < <(grep < cluster_env_files/etc_hostfile -e sdw | awk '{print $1}')
-	if [[ ${PROTOCOL} == nfs ]]; then
+	if [[ "${PROTOCOL}" == "nfs" ]]; then
 		HADOOP_HOSTNAME=localhost
 		HADOOP_USER=gpadmin
 		HDFS_BIN=/singlecluster/bin
@@ -422,11 +422,11 @@ function _main() {
 
 	setup_pxf_on_cluster
 
-	if [[ $PROTOCOL == nfs ]]; then
+	if [[ "$PROTOCOL" == "nfs" ]]; then
 		configure_nfs # configures NFS on the container
 	fi
 
-	if [[ $PROTOCOL != nfs ]] && [[ $KERBEROS != true ]]; then
+	if [[ "$PROTOCOL" != "nfs" ]] && [[ $KERBEROS != true ]]; then
 		run_multinode_smoke_test 1000
 	fi
 
