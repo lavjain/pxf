@@ -443,25 +443,25 @@ public class HcfsTypeTest {
 
     @Test
     public void testBasePathIsConfiguredToSomeValue() {
-        configuration.set("pxf.fs.basePath", "/my/base/path");
+        configuration.set("pxf.fs.basePath", "my/base/path");
         context.setProfileScheme("nfs");
         HcfsType nfs = HcfsType.getHcfsType(configuration, context);
         String uri = nfs.getDataUri(configuration, context);
         assertEquals("file:///my/base/path/foo/bar.txt", uri);
 
-        // no / preceding the basePath
-        configuration.set("pxf.fs.basePath", "my/base/path");
+        // trailing / in basePath
+        configuration.set("pxf.fs.basePath", "my/base/path/");
         context.setProfileScheme("nfs");
         uri = nfs.getDataUri(configuration, context);
         assertEquals("file:///my/base/path/foo/bar.txt", uri);
 
-        // no / trailing the basePath
-        configuration.set("pxf.fs.basePath", "my/base/path");
+        // preceding / in basePath
+        configuration.set("pxf.fs.basePath", "/my/base/path");
         context.setProfileScheme("nfs");
         uri = nfs.getDataUri(configuration, context);
         assertEquals("file:///my/base/path/foo/bar.txt", uri);
 
-        // preceding and trailing / in the basePath
+        // trailing and preceding / in basePath
         configuration.set("pxf.fs.basePath", "/my/base/path/");
         context.setProfileScheme("nfs");
         uri = nfs.getDataUri(configuration, context);
@@ -502,6 +502,42 @@ public class HcfsTypeTest {
         context.setDataSource("dir1/../dir2");
         HcfsType nfs = HcfsType.getHcfsType(configuration, context);
         nfs.getDataUri(configuration, context);
+    }
+
+    @Test
+    public void testFailsWhenARelativeDataSourceIsProvided4() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("the provided path '../' is invalid. Relative paths are not allowed by PXF");
+
+        configuration.set("pxf.fs.basePath", "/some/base/path");
+        context.setProfileScheme("nfs");
+        context.setDataSource("../");
+        HcfsType nfs = HcfsType.getHcfsType(configuration, context);
+        nfs.getDataUri(configuration, context);
+    }
+
+    @Test
+    public void testFailsWhenARelativeDataSourceIsProvided5() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("the provided path 'a/..' is invalid. Relative paths are not allowed by PXF");
+
+        configuration.set("pxf.fs.basePath", "/some/base/path");
+        context.setProfileScheme("nfs");
+        context.setDataSource("a/..");
+        HcfsType nfs = HcfsType.getHcfsType(configuration, context);
+        nfs.getDataUri(configuration, context);
+    }
+
+    @Test
+    public void testFailsWhenARelativeDataSourceIsProvidedForWrite() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("the provided path '../../../etc/passwd' is invalid. Relative paths are not allowed by PXF");
+
+        configuration.set("pxf.fs.basePath", "/some/base/path");
+        context.setProfileScheme("nfs");
+        context.setDataSource("../../../etc/passwd");
+        HcfsType nfs = HcfsType.getHcfsType(configuration, context);
+        nfs.getUriForWrite(configuration, context);
     }
 
     @Test

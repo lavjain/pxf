@@ -750,7 +750,7 @@ under the License.
         <protocol>wasbs</protocol>
     </profile>
 
-    <!-- NFS (Network File System profiles -->
+    <!-- NFS (Network File System) profiles -->
     <profile>
         <name>nfs:text</name>
         <description>This profile is suitable for using when reading delimited single line records
@@ -823,31 +823,6 @@ under the License.
             <fragmenter>org.greenplum.pxf.plugins.hdfs.HdfsDataFragmenter</fragmenter>
             <accessor>org.greenplum.pxf.plugins.json.JsonAccessor</accessor>
             <resolver>org.greenplum.pxf.plugins.json.JsonResolver</resolver>
-        </plugins>
-        <protocol>nfs</protocol>
-    </profile>
-    <profile>
-        <name>nfs:AvroSequenceFile</name>
-        <description>
-            Read an Avro format stored in sequence file, with separated schema file from Google
-            Cloud Storage
-        </description>
-        <plugins>
-            <fragmenter>org.greenplum.pxf.plugins.hdfs.HdfsDataFragmenter</fragmenter>
-            <accessor>org.greenplum.pxf.plugins.hdfs.SequenceFileAccessor</accessor>
-            <resolver>org.greenplum.pxf.plugins.hdfs.AvroResolver</resolver>
-        </plugins>
-        <protocol>nfs</protocol>
-    </profile>
-    <profile>
-        <name>nfs:SequenceFile</name>
-        <description>
-            Profile for accessing Sequence files serialized with a custom Writable class
-        </description>
-        <plugins>
-            <fragmenter>org.greenplum.pxf.plugins.hdfs.HdfsDataFragmenter</fragmenter>
-            <accessor>org.greenplum.pxf.plugins.hdfs.SequenceFileAccessor</accessor>
-            <resolver>org.greenplum.pxf.plugins.hdfs.WritableResolver</resolver>
         </plugins>
         <protocol>nfs</protocol>
     </profile>

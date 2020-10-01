@@ -219,7 +219,9 @@ public enum HcfsType {
 
         String effectiveDataSource = StringUtils.removeStart(dataSource, "/");
 
-        if ("..".equals(effectiveDataSource) || StringUtils.contains(effectiveDataSource, "../")) {
+        if ("..".equals(effectiveDataSource)
+                || StringUtils.contains(effectiveDataSource, "../")
+                || StringUtils.endsWith(effectiveDataSource, "/..")) {
             // Disallow relative paths
             throw new IllegalArgumentException(String
                     .format("the provided path '%s' is invalid. Relative paths are not allowed by PXF", effectiveDataSource));
@@ -265,13 +267,10 @@ public enum HcfsType {
      * @return the normalized basePath
      */
     protected String validateAndNormalizeBasePath(String basePath) {
-        if (StringUtils.isNotBlank(basePath)) {
-            if ("/".equals(basePath))
-                return "/";
-            return StringUtils.removeEnd(StringUtils.removeStart(basePath, "/"), "/") + "/";
-        }
-        // Return an empty string to prevent "null" in the string concatenation
-        return "";
+        return StringUtils.isBlank(basePath)
+                // Return an empty string to prevent "null" in the string concatenation
+                ? ""
+                : StringUtils.removeEnd(StringUtils.removeStart(basePath, "/"), "/") + "/";
     }
 
     /**
