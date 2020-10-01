@@ -123,9 +123,13 @@ function setup_pxf_on_cluster() {
 			-e 's|YOUR_DATABASE_JDBC_PASSWORD||' \
 			${PXF_CONF_DIR}/servers/db-hive/jdbc-site.xml &&
 		cp ~gpadmin/hive-report.sql ${PXF_CONF_DIR}/servers/db-hive &&
+		if [[ ${PROTOCOL} == nfs ]]; then
+			mkdir -p ${PXF_CONF_DIR}/servers/nfs
+			cp ${PXF_CONF_DIR}/templates/pxf-site.xml ${PXF_CONF_DIR}/servers/nfs
+			sed -i 's|</configuration>|<property><name>pxf.fs.basePath</name><value>${BASE_PATH}</value></property></configuration>|g' ${PXF_CONF_DIR}/servers/nfs/pxf-site.xml
+		fi &&
 		if [[ ${IMPERSONATION} == true ]]; then
 			cp -r ${PXF_CONF_DIR}/servers/default ${PXF_CONF_DIR}/servers/default-no-impersonation
-
 			if [[ ! -f ${PXF_CONF_DIR}/servers/default-no-impersonation/pxf-site.xml ]]; then
 				cp ${PXF_CONF_DIR}/templates/pxf-site.xml ${PXF_CONF_DIR}/servers/default-no-impersonation/pxf-site.xml
 			fi
