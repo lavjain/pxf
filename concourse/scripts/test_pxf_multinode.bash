@@ -358,6 +358,9 @@ function run_pxf_automation() {
 
 		export ACCESS_KEY_ID='${ACCESS_KEY_ID}' SECRET_ACCESS_KEY='${SECRET_ACCESS_KEY}'
 
+		export BASE_PATH='${BASE_PATH}'
+		export PROTOCOL=${PROTOCOL}
+
 		cd ${PWD}/pxf_src/automation
 		make -C ${PWD}/pxf_src/automation GROUP=${GROUP}
 	EOF

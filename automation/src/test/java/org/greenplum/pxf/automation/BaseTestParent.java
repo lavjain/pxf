@@ -332,7 +332,9 @@ public abstract class BaseTestParent {
         hdfs.removeDirectory(hdfs.getWorkingDirectory());
         hdfs.createDirectory(hdfs.getWorkingDirectory());
         if (gpdb.getUserName() != null) {
-            hdfs.setOwner("/" + hdfs.getWorkingDirectory(), gpdb.getUserName(), gpdb.getUserName());
+            hdfs.setOwner("/" + StringUtils.removeStart(hdfs.getWorkingDirectory(), "/"),
+                    gpdb.getUserName(),
+                    gpdb.getUserName());
         }
     }
 
