@@ -217,21 +217,21 @@ public enum HcfsType {
      */
     public String validateAndNormalizeDataSource(String dataSource) {
 
-        String effectiveBasePath = StringUtils.removeStart(dataSource, "/");
+        String effectiveDataSource = StringUtils.removeStart(dataSource, "/");
 
-        if ("..".equals(effectiveBasePath) || StringUtils.contains(effectiveBasePath, "../")) {
+        if ("..".equals(effectiveDataSource) || StringUtils.contains(effectiveDataSource, "../")) {
             // Disallow relative paths
             throw new IllegalArgumentException(String
-                    .format("the provided path '%s' is invalid. Relative paths are not allowed by PXF", effectiveBasePath));
+                    .format("the provided path '%s' is invalid. Relative paths are not allowed by PXF", effectiveDataSource));
         }
 
-        if (StringUtils.contains(effectiveBasePath, "$")) {
+        if (StringUtils.contains(effectiveDataSource, "$")) {
             // Disallow $ to prevent users to access environment variables
             throw new IllegalArgumentException(String
-                    .format("the provided path '%s' is invalid. The dollar sign character ($) is not allowed by PXF", effectiveBasePath));
+                    .format("the provided path '%s' is invalid. The dollar sign character ($) is not allowed by PXF", effectiveDataSource));
         }
 
-        return effectiveBasePath;
+        return effectiveDataSource;
     }
 
     protected String getDataUriForPrefix(Configuration configuration, RequestContext context, String scheme) {

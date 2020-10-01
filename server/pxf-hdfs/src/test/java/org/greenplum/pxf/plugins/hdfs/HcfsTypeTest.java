@@ -493,6 +493,18 @@ public class HcfsTypeTest {
     }
 
     @Test
+    public void testFailsWhenARelativeDataSourceIsProvided3() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("the provided path 'dir1/../dir2' is invalid. Relative paths are not allowed by PXF");
+
+        configuration.set("pxf.fs.basePath", "/some/base/path");
+        context.setProfileScheme("nfs");
+        context.setDataSource("dir1/../dir2");
+        HcfsType nfs = HcfsType.getHcfsType(configuration, context);
+        nfs.getDataUri(configuration, context);
+    }
+
+    @Test
     public void testDataSourceWithTwoDotsInName() {
         configuration.set("pxf.fs.basePath", "/some/base/path");
         context.setProfileScheme("nfs");
