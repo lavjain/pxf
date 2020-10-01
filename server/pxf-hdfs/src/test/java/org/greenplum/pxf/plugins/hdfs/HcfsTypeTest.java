@@ -366,7 +366,7 @@ public class HcfsTypeTest {
     @Test
     public void testFailureOnFileWhenBasePathIsNotConfigured() {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("the 'pxf.fs.basePath' configuration is required to access locally mounted file systems. Configure a valid 'pxf.fs.basePath' property to access this server");
+        thrown.expectMessage("configure a valid value for 'pxf.fs.basePath' property for this server to access the filesystem");
 
         HcfsType.getHcfsType(configuration, context);
     }
@@ -396,6 +396,19 @@ public class HcfsTypeTest {
         HcfsType file = HcfsType.getHcfsType(configuration, context);
         String uri = file.getDataUri(configuration, context);
         assertEquals("s3a://some-bucket/foo/bar.txt", uri);
+    }
+
+    @Test
+    public void testBasePathIsConfiguredToSomeValueForCustomFS() {
+        configuration.set("pxf.fs.basePath", "private");
+        configuration.set("fs.defaultFS", "xyz://abc");
+        context.setDataSource("foo/bar");
+        context.setTransactionId("XID-XYZ-123456");
+        context.setSegmentId(3);
+        context.addOption("COMPRESSION_CODEC", "snappy");
+
+        HcfsType type = HcfsType.getHcfsType(configuration, context);
+        assertEquals("xyz://abc/private/foo/bar/XID-XYZ-123456_3.snappy", type.getUriForWrite(configuration, context));
     }
 
     @Test

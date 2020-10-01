@@ -39,7 +39,7 @@ public enum HcfsType {
         protected String validateAndNormalizeBasePath(String basePath) {
             if (StringUtils.isBlank(basePath))
                 throw new IllegalArgumentException(
-                        String.format("the '%1$s' configuration is required to access locally mounted file systems. Configure a valid '%1$s' property to access this server",
+                        String.format("configure a valid value for '%s' property for this server to access the filesystem",
                                 CONFIG_KEY_BASE_PATH));
 
             return "/".equals(basePath)
@@ -244,15 +244,15 @@ public enum HcfsType {
         URI defaultFS = FileSystem.getDefaultUri(configuration);
 
         String uri;
-        String basePath = validateAndNormalizeBasePath(configuration.get(CONFIG_KEY_BASE_PATH));
+        String normalizedBasePath = validateAndNormalizeBasePath(configuration.get(CONFIG_KEY_BASE_PATH));
         String normalizedDataSource = validateAndNormalizeDataSource(dataSource);
 
         if (FILE_SCHEME.equals(defaultFS.getScheme())) {
             // if the defaultFS is file://, but enum is not FILE, use enum scheme only
-            uri = StringUtils.removeEnd(scheme, "://") + "://" + basePath + normalizedDataSource;
+            uri = StringUtils.removeEnd(scheme, "://") + "://" + normalizedBasePath + normalizedDataSource;
         } else {
             // if the defaultFS is not file://, use it, instead of enum scheme and append user's path
-            uri = StringUtils.removeEnd(defaultFS.toString(), "/") + basePath + "/" + normalizedDataSource;
+            uri = StringUtils.removeEnd(defaultFS.toString(), "/") + "/" + normalizedBasePath + normalizedDataSource;
         }
 
         disableSecureTokenRenewal(uri, configuration);
