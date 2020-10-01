@@ -767,7 +767,6 @@ jobs:
     image: ccp-7-image
     params:
       BASE_PATH: /mnt/nfs/var/nfsshare
-  # TODO: install PXF and configure PXF NFS
   - task: Setup PXF
     input_mapping:
       terraform: terraform_gpdb

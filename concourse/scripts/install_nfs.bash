@@ -26,7 +26,7 @@ showmount -e mdw
 
 echo "create mount point and mount it"
 mkdir -p ${BASE_PATH}
-mount mdw:/var/nfs ${BASE_PATH}
+mount -t nfs mdw:/var/nfs ${BASE_PATH}
 chown gpadmin:gpadmin ${BASE_PATH}
 chmod 755 ${BASE_PATH}
 
@@ -57,7 +57,7 @@ function run_nfs_installation() {
     sudo chown nfsnobody:nfsnobody /var/nfs
     sudo chmod 755 /var/nfs
     echo 'add /var/nfs to the exports file'
-    sudo sh -c \"echo '/var/nfs sdw1(rw,sync,no_root_squash,no_subtree_check) sdw2(rw,sync,no_root_squash,no_subtree_check)' >> /etc/exports\"
+    sudo sh -c \"echo '/var/nfs sdw1(rw,sync,no_root_squash,no_subtree_check) sdw2(rw,sync,no_root_squash,no_subtree_check) 10.0.80.0/23(rw,sync,no_root_squash,no_subtree_check)' >> /etc/exports\"
     echo 'ensure the file was modified'
     cat /etc/exports
     echo 'export shared directories'

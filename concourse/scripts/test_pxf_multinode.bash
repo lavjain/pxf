@@ -295,16 +295,12 @@ function configure_nfs() {
 	echo "install the NFS client"
 	yum install -y -q -e 0 nfs-utils
 
-	echo "start required NFS services"
-	service rpcbind start
-	service nfs-common start
-
 	echo "check available NFS shares in mdw"
 	showmount -e mdw
 
 	echo "create mount point and mount it"
 	mkdir -p "${BASE_PATH}"
-	mount mdw:/var/nfs "${BASE_PATH}"
+	mount -o nolock -t nfs mdw:/var/nfs "${BASE_PATH}"
 	chown gpadmin:gpadmin "${BASE_PATH}"
 	chmod 755 "${BASE_PATH}"
 
