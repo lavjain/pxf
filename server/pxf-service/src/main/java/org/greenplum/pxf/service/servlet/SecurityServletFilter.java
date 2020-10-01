@@ -106,7 +106,7 @@ public class SecurityServletFilter implements Filter {
         final String serverName = StringUtils.defaultIfBlank(getHeaderValue(request, SERVER_HEADER, false), "default");
         final String configDirectory = StringUtils.defaultIfBlank(getHeaderValue(request, CONFIG_HEADER, false), serverName);
         final Configuration configuration = configurationFactory.initConfiguration(configDirectory, serverName, gpdbUser, null);
-        final boolean isUserImpersonation = secureLogin.isUserImpersonationEnabled(configuration);
+        final boolean isUserImpersonation = SecureLogin.isUserImpersonationEnabled(configuration);
         final boolean isSecurityEnabled = Utilities.isSecurityEnabled(configuration);
 
         // Establish the UGI for the login user or the Kerberos principal for the given server, if applicable

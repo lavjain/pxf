@@ -194,7 +194,7 @@ public class SecureLogin {
      *
      * @return true if user impersonation is enabled, false otherwise
      */
-    public boolean isUserImpersonationEnabled(Configuration configuration) {
+    public static boolean isUserImpersonationEnabled(Configuration configuration) {
         String valueFromUserImpersonationOnServer = configuration.get(SecureLogin.CONFIG_KEY_SERVICE_USER_IMPERSONATION, System.getProperty(PROPERTY_KEY_USER_IMPERSONATION, "false"));
         return StringUtils.equalsIgnoreCase(valueFromUserImpersonationOnServer, "true");
     }
