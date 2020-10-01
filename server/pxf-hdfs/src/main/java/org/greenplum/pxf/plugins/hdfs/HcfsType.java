@@ -27,15 +27,6 @@ public enum HcfsType {
     },
     FILE {
         @Override
-        protected String getDataUriForPrefix(Configuration configuration, String dataSource, String scheme) {
-            if (SecureLogin.isUserImpersonationEnabled(configuration)) {
-                throw new IllegalArgumentException("impersonation is not supported when writing to file. " +
-                        "Set the impersonation value to false for the 'pxf.service.user.impersonation' property in your 'pxf-site.xml' configuration.");
-            }
-            return super.getDataUriForPrefix(configuration, dataSource, scheme);
-        }
-
-        @Override
         protected String validateAndNormalizeBasePath(String basePath) {
             if (StringUtils.isBlank(basePath))
                 throw new IllegalArgumentException(

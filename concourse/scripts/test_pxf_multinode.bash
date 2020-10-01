@@ -153,7 +153,10 @@ EOF
 		if [[ \"${PROTOCOL}\" == \"file\" ]]; then
 			mkdir -p ${PXF_CONF_DIR}/servers/file
 			cp ${PXF_CONF_DIR}/templates/pxf-site.xml ${PXF_CONF_DIR}/servers/file
-			sed -i 's|</configuration>|<property><name>pxf.fs.basePath</name><value>${BASE_PATH}</value></property></configuration>|g' ${PXF_CONF_DIR}/servers/file/pxf-site.xml
+			sed -i \
+			-e 's|</configuration>|<property><name>pxf.fs.basePath</name><value>${BASE_PATH}</value></property></configuration>|g' \
+			-e '/<name>pxf.service.user.impersonation<\/name>/ {n;s|<value>.*</value>|<value>false</value>|g;}' \
+			${PXF_CONF_DIR}/servers/file/pxf-site.xml
 		fi &&
 		if [[ ${IMPERSONATION} == true ]]; then
 			cp -r ${PXF_CONF_DIR}/servers/default ${PXF_CONF_DIR}/servers/default-no-impersonation
