@@ -80,6 +80,33 @@ function setup_pxf_on_cluster() {
 	# drop named query file for JDBC test to gpadmin's home on mdw
 	scp "${SSH_OPTS[@]}" pxf_src/automation/src/test/resources/{,hive-}report.sql gpadmin@mdw:
 
+	if [[ "${PROTOCOL}" == "file" ]]; then
+		# drop pxf-profiles.xml file with sequence file profiles for file protocol
+		cat > /tmp/pxf-profiles.xml <<-EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<profiles>
+    <profile>
+        <name>file:AvroSequenceFile</name>
+        <plugins>
+            <fragmenter>org.greenplum.pxf.plugins.hdfs.HdfsDataFragmenter</fragmenter>
+            <accessor>org.greenplum.pxf.plugins.hdfs.SequenceFileAccessor</accessor>
+            <resolver>org.greenplum.pxf.plugins.hdfs.AvroResolver</resolver>
+        </plugins>
+    </profile>
+    <profile>
+        <name>file:SequenceFile</name>
+        <plugins>
+            <fragmenter>org.greenplum.pxf.plugins.hdfs.HdfsDataFragmenter</fragmenter>
+            <accessor>org.greenplum.pxf.plugins.hdfs.SequenceFileAccessor</accessor>
+            <resolver>org.greenplum.pxf.plugins.hdfs.WritableResolver</resolver>
+        </plugins>
+    </profile>
+</profiles>
+EOF
+
+		scp "${SSH_OPTS[@]}" /tmp/pxf-profiles.xml "gpadmin@mdw:${PXF_CONF_DIR}/conf/pxf-profiles.xml"
+	fi
+
 	# init all PXFs using cluster command, configure PXF on master, sync configs and start pxf
 	ssh "${SSH_OPTS[@]}" gpadmin@mdw "
 		source ${GPHOME}/greenplum_path.sh &&

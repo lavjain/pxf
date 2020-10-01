@@ -164,6 +164,7 @@ ifneq "$(PROTOCOL)" ""
 				rm -rf $(PROTOCOL_HOME); \
 				exit 1; \
 			fi; \
+			echo "Make sure your $PXF_CONF/conf/pxf-profiles.xml file configures the file:AvroSequenceFile and file:SequenceFile profiles"; \
 			cp $(PXF_HOME)/templates/user/templates/pxf-site.xml $(PROTOCOL_HOME)/; \
 			sed $(SED_OPTS) 's|</configuration>|<property><name>pxf.fs.basePath</name><value>$(BASE_PATH)</value></property></configuration>|g' $(PROTOCOL_HOME)/pxf-site.xml; \
 		fi; \
