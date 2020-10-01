@@ -789,6 +789,7 @@ jobs:
           terraform_source: ccp_src/google/
         get_params:
           action: destroy
+    privileged: true
     file: pxf_src/concourse/tasks/test_pxf_on_ccp.yml
     image: gpdb[[gp_ver]]-pxf-dev-centos7-image
     params:
