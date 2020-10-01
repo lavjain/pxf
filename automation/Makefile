@@ -158,7 +158,7 @@ ifneq "$(PROTOCOL)" ""
 	@if [ ! -f "$(PROTOCOL_HOME)/$(PROTOCOL)-site.xml" ]; then \
 		cp $(PXF_HOME)/templates/user/templates/$(PROTOCOL)-site.xml $(PROTOCOL_HOME)/; \
 		cp $(PXF_HOME)/templates/user/templates/mapred-site.xml $(PROTOCOL_HOME)/; \
-		if [ $(PROTOCOL) = nfs ]; then \
+		if [ $(PROTOCOL) = file ]; then \
 			if [ ! -d "$(BASE_PATH)" ]; then \
 				echo "The NFS directory '$(BASE_PATH)' does not exist. Please configure it and try again"; \
 				rm -rf $(PROTOCOL_HOME); \

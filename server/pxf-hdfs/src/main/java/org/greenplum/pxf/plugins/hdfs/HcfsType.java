@@ -26,13 +26,15 @@ public enum HcfsType {
     },
     FILE {
         @Override
-        public String getDataUri(Configuration configuration, RequestContext context) {
-            throw new IllegalStateException("core-site.xml is missing or using unsupported file:// as default filesystem");
-        }
+        protected String validateAndNormalizeBasePath(String basePath) {
+            if (StringUtils.isBlank(basePath))
+                throw new IllegalArgumentException(
+                        String.format("the '%1$s' configuration is required to access locally mounted file systems. Configure a valid '%1$s' property to access this server",
+                                CONFIG_KEY_BASE_PATH));
 
-        @Override
-        public String validateAndNormalizeDataSource(String dataSource) {
-            return dataSource;
+            return "/".equals(basePath)
+                    ? "/"
+                    : "/" + StringUtils.removeEnd(StringUtils.removeStart(basePath, "/"), "/") + "/";
         }
     },
     GS,
@@ -43,19 +45,6 @@ public enum HcfsType {
         @Override
         public String validateAndNormalizeDataSource(String dataSource) {
             return dataSource;
-        }
-    },
-    NFS("file") {
-        @Override
-        protected String validateAndNormalizeBasePath(String basePath) {
-            if (StringUtils.isBlank(basePath))
-                throw new IllegalArgumentException(
-                        String.format("the '%s' configuration is required to access %s filesystems. Configure a valid '%s' property to access this server",
-                                CONFIG_KEY_BASE_PATH, this, CONFIG_KEY_BASE_PATH));
-
-            return "/".equals(basePath)
-                    ? "/"
-                    : "/" + StringUtils.removeEnd(StringUtils.removeStart(basePath, "/"), "/") + "/";
         }
     },
     S3,

@@ -39,7 +39,6 @@ public class HdfsFileFragmenterTest {
         context.setConfig("default");
         context.setServerName("default");
         context.setUser("test-user");
-        context.setProfileScheme("nfs");
 
         ConfigurationFactory mockConfigurationFactory = mock(ConfigurationFactory.class);
         when(mockConfigurationFactory.

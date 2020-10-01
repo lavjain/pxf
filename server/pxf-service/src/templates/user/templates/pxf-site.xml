@@ -42,8 +42,8 @@
         <value></value>
         <description>
             Sets the base path when constructing a URI for read and write
-            operations. This property is required for NFS-based server
-            configurations.
+            operations. This property must be configured on servers that
+            access file profiles.
         </description>
     </property>
     !-->

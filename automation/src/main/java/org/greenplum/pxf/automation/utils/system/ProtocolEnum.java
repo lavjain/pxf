@@ -9,7 +9,7 @@ public enum ProtocolEnum {
     ADL("adl"),
     GS("gs"),
     HDFS("hdfs"),
-    NFS("nfs") {
+    FILE("file") {
         @Override
         public String getExternalTablePath(String basePath, String path) {
             // Remove the basePath from the location URI for the table definition

@@ -62,7 +62,7 @@ anchors:
 ## ======================================================================
 resource_types:
 
-{% if multinode or multinode_no_impersonation or nfs %}
+{% if multinode or multinode_no_impersonation or file %}
 - name: terraform
   type: registry-image
   source:
@@ -140,7 +140,7 @@ resources:
     branch: ((pxf-git-branch))
     uri: ((pxf-git-remote))
 
-{% if multinode or multinode_no_impersonation or nfs %}
+{% if multinode or multinode_no_impersonation or file %}
 - name: ccp_src
   type: git
   source:
@@ -205,7 +205,7 @@ resources:
 {% endif %}
 {% set gp_ver = None %}
 
-{% if multinode or multinode_no_impersonation or ambari or nfs %}
+{% if multinode or multinode_no_impersonation or ambari or file %}
 - name: ccp-7-image
   type: registry-image
   icon: docker
@@ -290,7 +290,7 @@ resources:
 {% set gp_ver = None %}
 
 ## ---------- Auxiliary Resources ----------
-{% if multinode or multinode_no_impersonation or nfs %}
+{% if multinode or multinode_no_impersonation or file %}
 - name: terraform
   type: terraform
   source:
@@ -708,10 +708,10 @@ jobs:
 {% endif %}
 {% endif %}
 
-## ---------- NFS tests -----------------
+## ---------- FILE tests -----------------
 
-{% if nfs %}
-- name: Test PXF-GP[[gp_ver]]-NFS-NO-IMPERS on RHEL7
+{% if file %}
+- name: Test PXF-GP[[gp_ver]]-FILE-NO-IMPERS on RHEL7
   max_in_flight: 2
   plan:
   - in_parallel:
@@ -778,7 +778,7 @@ jobs:
       INSTALL_GPHDFS: false
       PXF_JVM_OPTS: ((pxf-jvm-opts))
       SKIP_HADOOP_SETUP: true
-  - task: Test PXF-GP[[gp_ver]]-NFS-NO-IMPERS on RHEL7
+  - task: Test PXF-GP[[gp_ver]]-FILE-NO-IMPERS on RHEL7
     on_success:
       do:
       - put: terraform_gpdb
@@ -797,7 +797,7 @@ jobs:
       GP_VER: [[gp_ver]]
       GROUP: hcfs
       IMPERSONATION: false
-      PROTOCOL: nfs
+      PROTOCOL: file
       TARGET_OS: centos
       TARGET_OS_VERSION: 7
 {% if slack_notification %}
