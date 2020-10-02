@@ -558,9 +558,11 @@ public class HdfsReadableTextTest extends BaseFeature {
             dataTable.appendRows(limitTable);
         }
 
-        hdfs.writeTableToFile(hdfsFilePath, dataTable, ",");
+        String limitPath = hdfsFilePath + "/limit_test/";
+
+        hdfs.writeTableToFile(limitPath, dataTable, ",");
         String[] fields = new String[]{"s1 text", "s2 text"};
-        prepareReadableTable("text_limit", fields, exTable.getPath(), exTable.getFormat());
+        prepareReadableTable("text_limit", fields, limitPath, exTable.getFormat());
 
         exTable.setDelimiter(",");
         gpdb.createTableAndVerify(exTable);
