@@ -59,6 +59,15 @@ public interface IFSFunctionality extends SystemObject {
     void removeDirectory(String path) throws Exception;
 
     /**
+     * Sets the ACL for the Directory
+     *
+     * @param path the directory path
+     * @param acl the acl string
+     * @throws IOException when an IO error occurs
+     */
+    void setAcl(String path, String acl) throws IOException;
+
+    /**
      * get File content as String
      *
      * @param path

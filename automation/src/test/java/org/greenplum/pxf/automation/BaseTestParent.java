@@ -1,15 +1,11 @@
 package org.greenplum.pxf.automation;
 
-import java.io.File;
-import java.lang.reflect.Method;
-
 import jsystem.framework.report.ListenerstManager;
 import jsystem.framework.sut.SutFactory;
 import jsystem.framework.system.SystemManagerImpl;
 import jsystem.framework.system.SystemObject;
 import jsystem.utils.FileUtils;
 import listeners.CustomAutomationLogger;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -21,14 +17,17 @@ import org.greenplum.pxf.automation.components.gpdb.Gpdb;
 import org.greenplum.pxf.automation.components.hdfs.Hdfs;
 import org.greenplum.pxf.automation.components.tinc.Tinc;
 import org.greenplum.pxf.automation.structures.tables.pxf.ReadableExternalTable;
+import org.greenplum.pxf.automation.utils.system.ProtocolEnum;
 import org.greenplum.pxf.automation.utils.system.ProtocolUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
-
 import reporters.CustomAutomationReport;
+
+import java.io.File;
+import java.lang.reflect.Method;
 
 /**
  * PXF Automation tests Base class, using {@link CustomAutomationLogger} testNG listener for custom
@@ -335,6 +334,10 @@ public abstract class BaseTestParent {
             hdfs.setOwner("/" + StringUtils.removeStart(hdfs.getWorkingDirectory(), "/"),
                     gpdb.getUserName(),
                     gpdb.getUserName());
+        }
+
+        if (ProtocolUtils.getProtocol() == ProtocolEnum.FILE) {
+            hdfs.setAcl(hdfs.getWorkingDirectory(), "group::rwx,user::rwx,other::rwx");
         }
     }
 

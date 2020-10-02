@@ -152,6 +152,7 @@ EOF
 		cp ~gpadmin/hive-report.sql ${PXF_CONF_DIR}/servers/db-hive &&
 		if [[ \"${PROTOCOL}\" == \"file\" ]]; then
 			mkdir -p ${PXF_CONF_DIR}/servers/file
+			cp ${PXF_CONF_DIR}/templates/mapred-site.xml ${PXF_CONF_DIR}/servers/file
 			cp ${PXF_CONF_DIR}/templates/pxf-site.xml ${PXF_CONF_DIR}/servers/file
 			sed -i \
 			-e 's|</configuration>|<property><name>pxf.fs.basePath</name><value>${BASE_PATH}</value></property></configuration>|g' \
