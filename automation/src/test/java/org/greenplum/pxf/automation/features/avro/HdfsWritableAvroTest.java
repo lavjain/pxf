@@ -275,6 +275,11 @@ public class HdfsWritableAvroTest extends BaseFeature {
         dropComplexTypes();
     }
 
+    @Override
+    protected boolean skipDirectoryCreation() {
+        return true;
+    }
+
     private void createComplexTypes() throws Exception {
         dropComplexTypes();
         gpdb.runQuery("CREATE TYPE mood AS ENUM ('sad', 'happy')");

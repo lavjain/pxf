@@ -78,6 +78,11 @@ public class HdfsWritableTextTest extends BaseWritableFeature {
         readableExTable.setPort(pxfPort);
     }
 
+    @Override
+    protected boolean skipDirectoryCreation() {
+        return true;
+    }
+
     /**
      * Insert data to Writable table using specific plugins in the table
      * location instead of using profile.

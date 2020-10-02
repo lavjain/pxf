@@ -107,7 +107,7 @@ public class HdfsReadableTextTest extends BaseFeature {
                         "n15 int",
                         "n16 int",
                         "n17 int"},
-                protocol.getExternalTablePath(hdfs.getBasePath(),  hdfsFilePath),
+                protocol.getExternalTablePath(hdfs.getBasePath(), hdfsFilePath),
                 "TEXT");
 
         exTable.setHost(pxfHost);
@@ -197,13 +197,9 @@ public class HdfsReadableTextTest extends BaseFeature {
     @Test(groups = {"features", "gpdb", "hcfs", "security"})
     public void readCsvFilesWithHeader() throws Exception {
         // set profile and format
-        exTable.setProfile(ProtocolUtils.getProtocol().value() + ":text");
-        exTable.setFormat("CSV");
-        exTable.setName("pxf_hcfs_csv_files_with_header");
+        prepareReadableTable("pxf_hcfs_csv_files_with_header", LINEITEM_SCHEMA, hdfs.getWorkingDirectory() + "/csv_files_with_header", "CSV");
         exTable.setUserParameters(new String[]{"SKIP_HEADER_COUNT=1"});
         exTable.setDelimiter("|");
-        exTable.setPath(hdfs.getWorkingDirectory() + "/csv_files_with_header");
-        exTable.setFields(LINEITEM_SCHEMA);
         // create external table
         gpdb.createTableAndVerify(exTable);
         // copy local CSV to HCFS
@@ -222,6 +218,7 @@ public class HdfsReadableTextTest extends BaseFeature {
      */
     @Test(groups = {"features", "gpdb", "hcfs", "security"})
     public void readBzip2CompressedCsv() throws Exception {
+        ProtocolEnum protocol = ProtocolUtils.getProtocol();
         BZip2Codec codec = new BZip2Codec();
         codec.setConf(hdfs.getConfiguration());
         char c = 'a';
@@ -239,7 +236,7 @@ public class HdfsReadableTextTest extends BaseFeature {
                         "dub double precision",
                         "longNum bigint",
                         "bool boolean"
-                }, hdfs.getWorkingDirectory() + "/bzip2/", ",");
+                }, protocol.getExternalTablePath(hdfs.getBasePath(), hdfs.getWorkingDirectory()) + "/bzip2/", ",");
         exTable.setHost(pxfHost);
         exTable.setPort(pxfPort);
         exTable.setFormat("CSV");
@@ -286,6 +283,7 @@ public class HdfsReadableTextTest extends BaseFeature {
 
     private void runMultiBlockedMultiLinedCsvTest(String locationPath, String hdfsPath, boolean useProfile) throws Exception {
 
+        ProtocolEnum protocol = ProtocolUtils.getProtocol();
         // prepare local CSV file
         dataTable = new Table("dataTable", null);
         String tempLocalDataPath = dataTempFolder + "/data.csv";
@@ -300,9 +298,10 @@ public class HdfsReadableTextTest extends BaseFeature {
         exTable = new ReadableExternalTable("pxf_multi_csv", new String[]{
                 "num1 int",
                 "word text",
-                "num2 int"}, locationPath, "CSV");
+                "num2 int"},
+                protocol.getExternalTablePath(hdfs.getBasePath(), locationPath), "CSV");
         if (useProfile) {
-            exTable.setProfile(ProtocolUtils.getProtocol().value() + ":text:multi");
+            exTable.setProfile(protocol.value() + ":text:multi");
         } else {
             exTable.setFragmenter("org.greenplum.pxf.plugins.hdfs.HdfsDataFragmenter");
             exTable.setAccessor("org.greenplum.pxf.plugins.hdfs.QuotedLineBreakAccessor");
@@ -329,9 +328,8 @@ public class HdfsReadableTextTest extends BaseFeature {
         hdfs.writeTableToFile(wildcardHdfsPath + "/data1.txt", dataTable, ",");
         hdfs.writeTableToFile(wildcardHdfsPath + "/data2.txt", dataTable, ",");
         // define and create external table
-        exTable.setProfile(ProtocolUtils.getProtocol().value() + ":text");
+        prepareReadableTable(exTable.getName(), exTable.getFields(), wildcardHdfsPath + "/*.txt", exTable.getFormat());
         exTable.setDelimiter(",");
-        exTable.setPath(wildcardHdfsPath + "/*.txt");
         gpdb.createTableAndVerify(exTable);
         // verify results
         runTincTest("pxf.features.hdfs.readable.text.wildcard.runTest");
@@ -365,9 +363,8 @@ public class HdfsReadableTextTest extends BaseFeature {
         hdfs.writeTableToFile(baseDirectory + "A/B/A/B/C/A/data_file4",
                 dataTable, ",");
         // define and create external table
-        exTable.setProfile(ProtocolUtils.getProtocol().value() + ":text");
+        prepareReadableTable(exTable.getName(), exTable.getFields(), baseDirectory, exTable.getFormat());
         exTable.setDelimiter(",");
-        exTable.setPath(baseDirectory);
         gpdb.createTableAndVerify(exTable);
         // verify results
         runTincTest("pxf.features.hdfs.readable.text.recursive.runTest");
@@ -633,5 +630,14 @@ public class HdfsReadableTextTest extends BaseFeature {
         gpdb.createTableAndVerify(exTable);
 
         runTincTest("pxf.features.hdfs.readable.text.errors.middle_of_stream.runTest");
+    }
+
+    private void prepareReadableTable(String name, String[] fields, String path, String format) {
+        ProtocolEnum protocol = ProtocolUtils.getProtocol();
+        exTable.setName(name);
+        exTable.setFormat(format);
+        exTable.setPath(protocol.getExternalTablePath(hdfs.getBasePath(), path));
+        exTable.setFields(fields);
+        exTable.setProfile(protocol.value() + ":text");
     }
 }
