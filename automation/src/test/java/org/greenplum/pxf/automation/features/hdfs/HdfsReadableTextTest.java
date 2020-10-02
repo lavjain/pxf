@@ -14,6 +14,7 @@ import org.greenplum.pxf.automation.structures.tables.utils.TableFactory;
 import org.greenplum.pxf.automation.utils.csv.CsvUtils;
 import org.greenplum.pxf.automation.utils.fileformats.FileFormatsUtils;
 import org.greenplum.pxf.automation.utils.jsystem.report.ReportUtils;
+import org.greenplum.pxf.automation.utils.system.ProtocolEnum;
 import org.greenplum.pxf.automation.utils.system.ProtocolUtils;
 import org.greenplum.pxf.automation.utils.tables.ComparisonUtils;
 import org.junit.Assert;
@@ -75,6 +76,7 @@ public class HdfsReadableTextTest extends BaseFeature {
     @Override
     protected void beforeMethod() throws Exception {
         super.beforeMethod();
+        ProtocolEnum protocol = ProtocolUtils.getProtocol();
         // path for storing data on HDFS
         hdfsFilePath = hdfs.getWorkingDirectory() + "/data";
         // prepare data in table
@@ -104,7 +106,9 @@ public class HdfsReadableTextTest extends BaseFeature {
                         "n14 int",
                         "n15 int",
                         "n16 int",
-                        "n17 int"}, hdfsFilePath, "TEXT");
+                        "n17 int"},
+                protocol.getExternalTablePath(hdfs.getBasePath(),  hdfsFilePath),
+                "TEXT");
 
         exTable.setHost(pxfHost);
         exTable.setPort(pxfPort);
@@ -376,10 +380,11 @@ public class HdfsReadableTextTest extends BaseFeature {
      */
     @Test(groups = {"features", "gpdb", "hcfs", "security"})
     public void emptyTextFile() throws Exception {
+        ProtocolEnum protocol = ProtocolUtils.getProtocol();
         // define and create external table
-        exTable.setProfile(ProtocolUtils.getProtocol().value() + ":text");
+        exTable.setProfile(protocol.value() + ":text");
         exTable.setDelimiter(",");
-        exTable.setPath(exTable.getPath() + "_empty");
+        exTable.setPath(protocol.getExternalTablePath(hdfs.getBasePath(), exTable.getPath() + "_empty"));
         gpdb.createTableAndVerify(exTable);
         // write empty data to HDFS
         hdfs.writeTableToFile(hdfsFilePath + "_empty", new Table("emptyTable", null), ",");

@@ -403,7 +403,10 @@ public class HdfsWritableAvroTest extends BaseFeature {
     }
 
     private void prepareWritableExternalTable(String name, String[] fields, String path) {
-        exTable = new WritableExternalTable(name + "_writable", fields, protocol.getExternalTablePath(hdfs.getBasePath(), path), "custom");
+        exTable = new WritableExternalTable(name + "_writable",
+                fields,
+                protocol.getExternalTablePath(hdfs.getBasePath(), path),
+                "custom");
         exTable.setHost(pxfHost);
         exTable.setPort(pxfPort);
         exTable.setFormatter("pxfwritable_export");
@@ -411,7 +414,10 @@ public class HdfsWritableAvroTest extends BaseFeature {
     }
 
     private void prepareReadableExternalTable(String name, String[] fields, String path) {
-        readableExternalTable = new ReadableExternalTable(name + "_readable", fields, protocol.getExternalTablePath(hdfs.getBasePath(), path), "custom");
+        readableExternalTable = new ReadableExternalTable(name + "_readable",
+                fields,
+                protocol.getExternalTablePath(hdfs.getBasePath(), path),
+                "custom");
         readableExternalTable.setHost(pxfHost);
         readableExternalTable.setPort(pxfPort);
         readableExternalTable.setFormatter("pxfwritable_import");
