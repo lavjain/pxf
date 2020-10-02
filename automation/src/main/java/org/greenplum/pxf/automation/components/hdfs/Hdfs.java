@@ -19,8 +19,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
-import org.apache.hadoop.fs.permission.AclEntry;
-import org.apache.hadoop.fs.permission.AclEntryType;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.IntWritable;
@@ -247,14 +245,6 @@ public class Hdfs extends BaseSystemObject implements IFSFunctionality {
         if (fs.exists(dataPath)) {
             fs.delete(dataPath, true);
         }
-        ReportUtils.stopLevel(report);
-    }
-
-    @Override
-    public void setAcl(String path, String acl) throws IOException {
-        ReportUtils.startLevel(report, getClass(), "Set ACL for " + path + " to " + acl);
-        List<AclEntry> aclSpec = AclEntry.parseAclSpec(acl, true);
-        fs.setAcl(getDatapath(path), aclSpec);
         ReportUtils.stopLevel(report);
     }
 

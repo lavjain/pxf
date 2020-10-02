@@ -335,10 +335,6 @@ public abstract class BaseTestParent {
                     gpdb.getUserName(),
                     gpdb.getUserName());
         }
-
-        if (ProtocolUtils.getProtocol() == ProtocolEnum.FILE) {
-            hdfs.setAcl(hdfs.getWorkingDirectory(), "group::rwx,user::rwx,other::rwx");
-        }
     }
 
     protected void removeWorkingDirectory(Hdfs hdfs) {
