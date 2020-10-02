@@ -454,63 +454,63 @@ public class SecureLoginTest {
 
     @Test
     public void testGlobalImpersonationPropertyAbsent() {
-        assertFalse(SecureLogin.isUserImpersonationEnabled(configuration));
+        assertFalse(secureLogin.isUserImpersonationEnabled(configuration));
     }
 
     @Test
     public void testGlobalImpersonationPropertyEmpty() {
         System.setProperty(PROPERTY_KEY_USER_IMPERSONATION, "");
-        assertFalse(SecureLogin.isUserImpersonationEnabled(configuration));
+        assertFalse(secureLogin.isUserImpersonationEnabled(configuration));
     }
 
     @Test
     public void testGlobalImpersonationPropertyFalse() {
         System.setProperty(PROPERTY_KEY_USER_IMPERSONATION, "foo");
-        assertFalse(SecureLogin.isUserImpersonationEnabled(configuration));
+        assertFalse(secureLogin.isUserImpersonationEnabled(configuration));
     }
 
     @Test
     public void testGlobalImpersonationPropertyTRUE() {
         System.setProperty(PROPERTY_KEY_USER_IMPERSONATION, "TRUE");
-        assertTrue(SecureLogin.isUserImpersonationEnabled(configuration));
+        assertTrue(secureLogin.isUserImpersonationEnabled(configuration));
     }
 
     @Test
     public void testGlobalImpersonationPropertyTrue() {
         System.setProperty(PROPERTY_KEY_USER_IMPERSONATION, "true");
-        assertTrue(SecureLogin.isUserImpersonationEnabled(configuration));
+        assertTrue(secureLogin.isUserImpersonationEnabled(configuration));
     }
 
     @Test
     public void testServerConfigurationImpersonationPropertyFalse() {
         configuration.set("pxf.service.user.impersonation", "foo");
-        assertFalse(SecureLogin.isUserImpersonationEnabled(configuration));
+        assertFalse(secureLogin.isUserImpersonationEnabled(configuration));
     }
 
     @Test
     public void testServerConfigurationImpersonationPropertyTrue() {
         configuration.set("pxf.service.user.impersonation", "true");
-        assertTrue(SecureLogin.isUserImpersonationEnabled(configuration));
+        assertTrue(secureLogin.isUserImpersonationEnabled(configuration));
     }
 
     @Test
     public void testServerConfigurationImpersonationPropertyTRUE() {
         configuration.set("pxf.service.user.impersonation", "TRUE");
-        assertTrue(SecureLogin.isUserImpersonationEnabled(configuration));
+        assertTrue(secureLogin.isUserImpersonationEnabled(configuration));
     }
 
     @Test
     public void testServerConfigurationImpersonationOverwritesGlobalTrue() {
         System.setProperty(PROPERTY_KEY_USER_IMPERSONATION, "false");
         configuration.set("pxf.service.user.impersonation", "true");
-        assertTrue(SecureLogin.isUserImpersonationEnabled(configuration));
+        assertTrue(secureLogin.isUserImpersonationEnabled(configuration));
     }
 
     @Test
     public void testServerConfigurationImpersonationOverwritesGlobalFalse() {
         System.setProperty(PROPERTY_KEY_USER_IMPERSONATION, "true");
         configuration.set("pxf.service.user.impersonation", "false");
-        assertFalse(SecureLogin.isUserImpersonationEnabled(configuration));
+        assertFalse(secureLogin.isUserImpersonationEnabled(configuration));
     }
 
     private static void resetProperty(String key, String val) {

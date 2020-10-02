@@ -236,7 +236,7 @@ public class SecurityServletFilterTest {
     private void expectScenario(boolean kerberos, boolean impersonation, boolean serviceUser) throws Exception {
         when(mockConfiguration.get("hadoop.security.authentication", "simple"))
                 .thenReturn(kerberos ? "kerberos" : "simple");
-        when(mockConfiguration.get("pxf.service.user.impersonation", "false")).thenReturn(String.valueOf(impersonation));
+        when(mockSecureLogin.isUserImpersonationEnabled(mockConfiguration)).thenReturn(impersonation);
         when(mockLoginUGI.getUserName()).thenReturn("login-user");
 
         if (serviceUser) {
