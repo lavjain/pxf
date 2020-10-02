@@ -558,7 +558,7 @@ public class HdfsReadableTextTest extends BaseFeature {
             dataTable.appendRows(limitTable);
         }
 
-        String limitPath = hdfsFilePath + "/limit_test/";
+        String limitPath = hdfs.getWorkingDirectory() + "/limit_test";
 
         hdfs.writeTableToFile(limitPath, dataTable, ",");
         String[] fields = new String[]{"s1 text", "s2 text"};
@@ -583,12 +583,11 @@ public class HdfsReadableTextTest extends BaseFeature {
         }
         dataTable.addRow(new String[]{"joker", "ha"});
 
-        hdfs.writeTableToFile(hdfsFilePath, dataTable, ",");
+        String path = hdfs.getWorkingDirectory() + "/negative_bad_text_data";
+        hdfs.writeTableToFile(path, dataTable, ",");
 
         String[] fields = new String[]{"num int", "string text"};
-        exTable.setName("bad_text");
-        exTable.setFields(fields);
-        exTable.setProfile(ProtocolUtils.getProtocol().value() + ":text");
+        prepareReadableTable("bad_text", fields, path, exTable.getFormat());
         exTable.setDelimiter(",");
 
         gpdb.createTableAndVerify(exTable);
