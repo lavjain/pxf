@@ -332,9 +332,8 @@ function configure_nfs() {
 	echo "create mount point and mount it"
 	mkdir -p "${BASE_PATH}"
 	mount -o nolock -t nfs mdw:/var/nfs "${BASE_PATH}"
-	mkdir -p "${BASE_PATH}/tmp/pxf_automation_data"
 	chown -R gpadmin:gpadmin "${BASE_PATH}"
-	chmod -R 777 "${BASE_PATH}"
+	chmod -R 755 "${BASE_PATH}"
 
 	echo "verify the mount worked"
 	mount | grep nfs

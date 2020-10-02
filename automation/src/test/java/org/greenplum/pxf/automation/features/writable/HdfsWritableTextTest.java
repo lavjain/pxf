@@ -382,12 +382,6 @@ public class HdfsWritableTextTest extends BaseWritableFeature {
         verifyResult(hdfsPath, dataTable, EnumCompressionTypes.BZip2);
     }
 
-    private void prepareWritableExternalTable(String path, String format) {
-        ProtocolEnum protocol = ProtocolUtils.getProtocol();
-        writableExTable.setPath(protocol.getExternalTablePath(hdfs.getBasePath(), path));
-        writableExTable.setFormat(format);
-    }
-
     /**
      * Copy plain text data from very wide rows
      *
@@ -666,5 +660,11 @@ public class HdfsWritableTextTest extends BaseWritableFeature {
                 gpdb.runQuery("INSERT INTO " + table.getName() + " SELECT * FROM " + data.getName());
                 break;
         }
+    }
+
+    private void prepareWritableExternalTable(String path, String format) {
+        ProtocolEnum protocol = ProtocolUtils.getProtocol();
+        writableExTable.setPath(protocol.getExternalTablePath(hdfs.getBasePath(), path));
+        writableExTable.setFormat(format);
     }
 }

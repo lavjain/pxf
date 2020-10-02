@@ -273,23 +273,19 @@ public class ParquetTest extends BaseFeature {
     private void prepareReadableExternalTable(String name, String[] fields, String path) throws Exception {
         exTable = new ReadableExternalTable(name, fields,
                 protocol.getExternalTablePath(hdfs.getBasePath(), path), "custom");
-        exTable.setHost(pxfHost);
-        exTable.setPort(pxfPort);
         exTable.setFormatter("pxfwritable_import");
         exTable.setProfile(protocol.value() + ":parquet");
-        gpdb.createTableAndVerify(exTable);
+        createTable(exTable);
     }
 
     private void prepareWritableExternalTable(String name, String[] fields, String path, String[] userParameters) throws Exception {
         exTable = new WritableExternalTable(name, fields,
                 protocol.getExternalTablePath(hdfs.getBasePath(), path), "custom");
-        exTable.setHost(pxfHost);
-        exTable.setPort(pxfPort);
         exTable.setFormatter("pxfwritable_export");
         exTable.setProfile(protocol.value() + ":parquet");
         if (userParameters != null) {
             exTable.setUserParameters(userParameters);
         }
-        gpdb.createTableAndVerify(exTable);
+        createTable(exTable);
     }
 }
