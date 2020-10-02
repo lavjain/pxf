@@ -546,14 +546,4 @@ public class HcfsTypeTest {
         file.getDataUri(configuration, context);
     }
 
-    @Test
-    public void testFailsWhenImpersonationIsEnabledForFile() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("impersonation is not supported when writing to file. Set the impersonation value to false for the 'pxf.service.user.impersonation' property in your 'pxf-site.xml' configuration.");
-
-        configuration.set("pxf.fs.basePath", "/");
-        configuration.set("pxf.service.user.impersonation", "true");
-        HcfsType.getHcfsType(configuration, context);
-    }
-
 }
