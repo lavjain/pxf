@@ -24,6 +24,14 @@ LOCAL_GPHD_ROOT=/singlecluster
 PROTOCOL=${PROTOCOL:-}
 PROXY_USER=${PROXY_USER:-pxfuser}
 
+
+if [[ "${PROTOCOL}" == "file" ]]; then
+	# ensure user id and group id match the VM id on the container to be able
+	# to read and write files
+	usermod -u  "$(ssh mdw 'id -u gpadmin')" gpadmin
+	groupmod -g "$(ssh mdw 'id -g gpadmin')" gpadmin
+fi
+
 function configure_local_hdfs() {
 	sed -i -e "s|hdfs://0.0.0.0:8020|hdfs://${HADOOP_HOSTNAME}:8020|" \
 	${LOCAL_GPHD_ROOT}/hadoop/etc/hadoop/core-site.xml ${LOCAL_GPHD_ROOT}/hbase/conf/hbase-site.xml

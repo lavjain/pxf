@@ -185,7 +185,7 @@ public class Hdfs extends BaseSystemObject implements IFSFunctionality {
     public ArrayList<String> list(String path) throws Exception {
         ReportUtils.startLevel(report, getClass(), "List From " + path);
         RemoteIterator<LocatedFileStatus> list = fs.listFiles(getDatapath(path), true);
-        ArrayList<String> filesList = new ArrayList<String>();
+        ArrayList<String> filesList = new ArrayList<>();
         while (list.hasNext()) {
             filesList.add(list.next().getPath().toString());
         }
