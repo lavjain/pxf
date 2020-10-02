@@ -332,7 +332,7 @@ function configure_nfs() {
 	mkdir -p "${BASE_PATH}"
 	mount -o nolock -t nfs mdw:/var/nfs "${BASE_PATH}"
 	chown gpadmin:gpadmin "${BASE_PATH}"
-	chmod 755 "${BASE_PATH}"
+	chmod -R 777 "${BASE_PATH}"
 
 	echo "verify the mount worked"
 	mount | grep nfs
