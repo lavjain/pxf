@@ -330,11 +330,13 @@ public abstract class BaseTestParent {
 
     protected void initializeWorkingDirectory(Gpdb gpdb, Hdfs hdfs) throws Exception {
         hdfs.removeDirectory(hdfs.getWorkingDirectory());
-        hdfs.createDirectory(hdfs.getWorkingDirectory());
-        if (gpdb.getUserName() != null) {
-            hdfs.setOwner("/" + StringUtils.removeStart(hdfs.getWorkingDirectory(), "/"),
-                    gpdb.getUserName(),
-                    gpdb.getUserName());
+        if (skipDirectoryCreation()) {
+            hdfs.createDirectory(hdfs.getWorkingDirectory());
+            if (gpdb.getUserName() != null) {
+                hdfs.setOwner("/" + StringUtils.removeStart(hdfs.getWorkingDirectory(), "/"),
+                        gpdb.getUserName(),
+                        gpdb.getUserName());
+            }
         }
     }
 
@@ -345,5 +347,12 @@ public abstract class BaseTestParent {
         } catch (Exception e) {
             e.printStackTrace(System.err);
         }
+    }
+
+    // For write operations, we don't need a to stage a working directory, since
+    // the PXF server will create the directory structure needed to perform
+    // write test
+    protected boolean skipDirectoryCreation() {
+        return false;
     }
 }

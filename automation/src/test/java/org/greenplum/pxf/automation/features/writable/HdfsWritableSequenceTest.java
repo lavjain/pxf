@@ -67,6 +67,11 @@ public class HdfsWritableSequenceTest extends BaseWritableFeature {
     };
 
     @Override
+    protected boolean skipDirectoryCreation() {
+        return true;
+    }
+
+    @Override
     protected void beforeClass() throws Exception {
         super.beforeClass();
 
