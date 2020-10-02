@@ -335,7 +335,7 @@ public class HdfsReadableTextTest extends BaseFeature {
         runTincTest("pxf.features.hdfs.readable.text.wildcard.runTest");
 
         // test ? wildcard
-        exTable.setPath(wildcardHdfsPath + "/data?.txt");
+        prepareReadableTable(exTable.getName(), exTable.getFields(), wildcardHdfsPath + "/data?.txt", exTable.getFormat());
         gpdb.createTableAndVerify(exTable);
         // verify results
         runTincTest("pxf.features.hdfs.readable.text.wildcard.runTest");
@@ -559,13 +559,10 @@ public class HdfsReadableTextTest extends BaseFeature {
         }
 
         hdfs.writeTableToFile(hdfsFilePath, dataTable, ",");
-
         String[] fields = new String[]{"s1 text", "s2 text"};
-        exTable.setFields(fields);
-        exTable.setName("text_limit");
-        exTable.setProfile(ProtocolUtils.getProtocol().value() + ":text");
-        exTable.setDelimiter(",");
+        prepareReadableTable("text_limit", fields, exTable.getPath(), exTable.getFormat());
 
+        exTable.setDelimiter(",");
         gpdb.createTableAndVerify(exTable);
 
         runTincTest("pxf.features.hdfs.readable.text.limit.runTest");

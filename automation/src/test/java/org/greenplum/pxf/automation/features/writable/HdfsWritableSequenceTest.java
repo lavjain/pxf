@@ -1,5 +1,7 @@
 package org.greenplum.pxf.automation.features.writable;
 
+import org.apache.commons.lang.StringUtils;
+import org.greenplum.pxf.automation.components.cluster.PhdCluster;
 import org.greenplum.pxf.automation.components.cluster.SingleCluster;
 import org.greenplum.pxf.automation.datapreparer.CustomSequencePreparer;
 import org.greenplum.pxf.automation.features.BaseWritableFeature;
@@ -7,8 +9,6 @@ import org.greenplum.pxf.automation.structures.tables.basic.Table;
 import org.greenplum.pxf.automation.structures.tables.utils.TableFactory;
 import org.greenplum.pxf.automation.utils.exception.ExceptionUtils;
 import org.greenplum.pxf.automation.utils.fileformats.FileFormatsUtils;
-import org.apache.commons.lang.StringUtils;
-import org.greenplum.pxf.automation.components.cluster.PhdCluster;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.postgresql.util.PSQLException;
@@ -65,11 +65,6 @@ public class HdfsWritableSequenceTest extends BaseWritableFeature {
             "short5 SMALLINT",
             "bt     BYTEA",
     };
-
-    @Override
-    protected boolean skipDirectoryCreation() {
-        return true;
-    }
 
     @Override
     protected void beforeClass() throws Exception {

@@ -78,11 +78,6 @@ public class HdfsWritableTextTest extends BaseWritableFeature {
         readableExTable.setPort(pxfPort);
     }
 
-    @Override
-    protected boolean skipDirectoryCreation() {
-        return true;
-    }
-
     /**
      * Insert data to Writable table using specific plugins in the table
      * location instead of using profile.
@@ -255,8 +250,7 @@ public class HdfsWritableTextTest extends BaseWritableFeature {
     public void csvFormatInsert() throws Exception {
 
         String hdfsPath = hdfsWritePath + writableTableName + "_csv";
-        writableExTable.setPath(hdfsPath);
-        writableExTable.setFormat("CSV");
+        prepareWritableExternalTable(hdfsPath, "CSV");
         gpdb.createTableAndVerify(writableExTable);
 
         insertData(dataTable, writableExTable, InsertionMethod.INSERT);
@@ -272,8 +266,7 @@ public class HdfsWritableTextTest extends BaseWritableFeature {
     public void csvFormatCopyFromStdin() throws Exception {
 
         String hdfsPath = hdfsWritePath + writableTableName + "_csv";
-        writableExTable.setPath(hdfsPath);
-        writableExTable.setFormat("CSV");
+        prepareWritableExternalTable(hdfsPath, "CSV");
         gpdb.createTableAndVerify(writableExTable);
 
         insertData(dataTable, writableExTable, InsertionMethod.COPY);
@@ -293,8 +286,7 @@ public class HdfsWritableTextTest extends BaseWritableFeature {
         gpdb.createTableAndVerify(readableExTable);
 
         String hdfsPath = hdfsWritePath + writableTableName + "_csv";
-        writableExTable.setPath(hdfsPath);
-        writableExTable.setFormat("CSV");
+        prepareWritableExternalTable(hdfsPath,"CSV");
         createTable(writableExTable);
 
         insertData(readableExTable, writableExTable, InsertionMethod.INSERT_FROM_TABLE);
@@ -388,6 +380,12 @@ public class HdfsWritableTextTest extends BaseWritableFeature {
 
         insertData(dataTable, writableExTable, InsertionMethod.COPY);
         verifyResult(hdfsPath, dataTable, EnumCompressionTypes.BZip2);
+    }
+
+    private void prepareWritableExternalTable(String path, String format) {
+        ProtocolEnum protocol = ProtocolUtils.getProtocol();
+        writableExTable.setPath(protocol.getExternalTablePath(hdfs.getBasePath(), path));
+        writableExTable.setFormat(format);
     }
 
     /**
