@@ -339,7 +339,9 @@ public class HdfsWritableAvroTest extends BaseFeature {
         addJsonNodesToMap(jsonToCompare, resourcePath + compareFile);
 
         // for HCFS on Cloud, wait a bit for async write in previous steps to finish
-        sleep(10000);
+        if (protocol != ProtocolEnum.HDFS && protocol != ProtocolEnum.FILE) {
+            sleep(10000);
+        }
         for (String srcPath : hdfs.list(fullTestPath)) {
             final String fileName = "file_" + cnt++;
             final String filePath = publicStage + fileName;

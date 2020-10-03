@@ -6,7 +6,6 @@ import org.greenplum.pxf.automation.components.cluster.SingleCluster;
 import org.greenplum.pxf.automation.datapreparer.CustomSequencePreparer;
 import org.greenplum.pxf.automation.features.BaseWritableFeature;
 import org.greenplum.pxf.automation.structures.tables.basic.Table;
-import org.greenplum.pxf.automation.structures.tables.pxf.ReadableExternalTable;
 import org.greenplum.pxf.automation.structures.tables.utils.TableFactory;
 import org.greenplum.pxf.automation.utils.exception.ExceptionUtils;
 import org.greenplum.pxf.automation.utils.fileformats.FileFormatsUtils;
@@ -152,12 +151,13 @@ public class HdfsWritableSequenceTest extends BaseWritableFeature {
             for (String[] userParam : userParams) {
 
                 String hdfsDir = hdfsWritePath + writableTableName + testNum;
-                prepareWritableExternalTable(writableExTable.getName(), customWritableFields, hdfsDir);
+                String locationDir = protocol.getExternalTablePath(hdfs.getBasePath(), hdfsDir);
+                writableExTable.setPath(locationDir);
                 writableExTable.setCompressionCodec(codec);
                 writableExTable.setUserParameters(userParam);
                 gpdb.createTableAndVerify(writableExTable);
 
-                prepareReadableTable(readableExTable.getName(), readableExTable.getFields(), hdfsDir);
+                readableExTable.setPath(locationDir);
                 gpdb.createTableAndVerify(readableExTable);
 
                 gpdb.copyFromFile(writableExTable, path, null, false);
