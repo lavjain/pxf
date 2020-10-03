@@ -101,6 +101,7 @@ public class ParquetTest extends BaseFeature {
     public void beforeClass() throws Exception {
         // path for storing data on HDFS (for processing by PXF)
         hdfsPath = hdfs.getWorkingDirectory() + "/parquet/";
+        protocol = ProtocolUtils.getProtocol();
 
         String resourcePath = localDataResourcesFolder + "/parquet/";
         hdfs.copyFromLocal(resourcePath + PARQUET_PRIMITIVE_TYPES, hdfsPath + PARQUET_PRIMITIVE_TYPES);
@@ -120,13 +121,11 @@ public class ParquetTest extends BaseFeature {
         gpdb.copyFromFile(gpdbNumericWithPrecisionScaleTable, new File(localDataResourcesFolder
                 + "/numeric/" + NUMERIC_FILENAME), "E','", true);
 
-        protocol = ProtocolUtils.getProtocol();
+        prepareReadableExternalTable(PXF_PARQUET_TABLE, PARQUET_TABLE_COLUMNS, hdfsPath + PARQUET_PRIMITIVE_TYPES);
     }
 
     @Test(groups = {"features", "gpdb", "security", "hcfs"})
     public void parquetReadPrimitives() throws Exception {
-
-        prepareReadableExternalTable(PXF_PARQUET_TABLE, PARQUET_TABLE_COLUMNS, hdfsPath + PARQUET_PRIMITIVE_TYPES);
 
         gpdb.runQuery("CREATE OR REPLACE VIEW parquet_view AS SELECT s1, s2, n1, d1, dc1, " +
                 "CAST(tm AS TIMESTAMP WITH TIME ZONE) AT TIME ZONE 'PDT' as tm, " +
@@ -246,7 +245,8 @@ public class ParquetTest extends BaseFeature {
 
     private void runWriteScenario(String writeTableName, String readTableName,
                                   String filename, String[] userParameters) throws Exception {
-        prepareWritableExternalTable(writeTableName, PARQUET_TABLE_COLUMNS, hdfsPath, userParameters);
+        prepareWritableExternalTable(writeTableName,
+                PARQUET_TABLE_COLUMNS, hdfsPath + filename, userParameters);
         gpdb.runQuery("INSERT INTO " + exTable.getName() + " SELECT s1, s2, n1, d1, dc1, tm, " +
                 "f, bg, b, tn, vc1, sml, c1, bin FROM " + PXF_PARQUET_TABLE);
 
@@ -262,7 +262,8 @@ public class ParquetTest extends BaseFeature {
                 }
             }
         }
-        prepareReadableExternalTable(readTableName, PARQUET_TABLE_COLUMNS, hdfsPath + filename);
+        prepareReadableExternalTable(readTableName,
+                PARQUET_TABLE_COLUMNS, hdfsPath + filename);
         gpdb.runQuery("CREATE OR REPLACE VIEW parquet_view AS SELECT s1, s2, n1, d1, dc1, " +
                 "CAST(tm AS TIMESTAMP WITH TIME ZONE) AT TIME ZONE 'PDT' as tm, " +
                 "f, bg, b, tn, sml, vc1, c1, bin FROM " + readTableName);
